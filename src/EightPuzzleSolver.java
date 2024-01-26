@@ -64,12 +64,16 @@ public class EightPuzzleSolver {
 
                 // This is an available move, so swap the empty space and the tile at this position
                 String tileToMove = aMove.layout.substring(nextMove, nextMove+1);
-                StringBuilder sb = new StringBuilder(aMove.layout);
-                sb.setCharAt(emptyPos, tileToMove.charAt(0));
-                sb.setCharAt(nextMove, EMPTY.charAt(0));
+                char[] myArray = aMove.layout.toCharArray();
+                myArray[emptyPos] = tileToMove.charAt(0);
+                myArray[nextMove] = EMPTY.charAt(0);
+
+                //StringBuilder sb = new StringBuilder(aMove.layout);
+                //sb.setCharAt(emptyPos, tileToMove.charAt(0));
+                //sb.setCharAt(nextMove, EMPTY.charAt(0));
 
                 // Save this move to the generational map.  It will return true if we have solved the puzzle
-                if(addPuzzleMove(generationCounter, anId, sb.toString()))
+                if(addPuzzleMove(generationCounter, anId, String.valueOf(myArray)))
                 {
                     System.out.println("Puzzle is solved");
                     return true;
@@ -92,7 +96,7 @@ public class EightPuzzleSolver {
         String genId = generation + "-" + moveCounter++;
         genMap.put(genId, newMove);
 
-        //System.out.println("Gen id["+ genId + "] move: " + newMove);
+        System.out.println("Gen id["+ genId + "] move: " + newMove);
 
         return (solutionLayout.equals(newMove.layout));
     }
