@@ -8,6 +8,7 @@ public class EightPuzzleSolver {
     private final String solutionLayout = "123804765";
     static private final String START = "START";
     static private final String EMPTY = "0";
+    static private final int INITIAL_EMPTY_POS = 99;
     private int generationCounter = 0;
     private int moveCounter = 0;
 
@@ -16,7 +17,7 @@ public class EightPuzzleSolver {
         generationLog = new Vector<>(50);
 
         HashMap<String, EightPuzzleMove> firstGeneration = new HashMap<>();
-        firstGeneration.put(START, new EightPuzzleMove(START, startingLayout));
+        firstGeneration.put(START, new EightPuzzleMove(START, INITIAL_EMPTY_POS, startingLayout));
         generationLog.add(generationCounter,firstGeneration);
     }
 
@@ -52,15 +53,15 @@ public class EightPuzzleSolver {
             int emptyPos = aMove.layout.indexOf(EMPTY);
             //System.out.println("current layout = " + aMove.layout + " emptyPos=" + emptyPos);
 
-            // Determine what the next moves would be for this layout
+            // Determine what the next moves could be for this layout
             Iterator<String> moves = EightPuzzleMoveRules.getAvailableMoves(emptyPos).iterator();
             while (moves.hasNext())
             {
                 Integer nextMove = Integer.parseInt(moves.next());
 
-                // Skip past the move that we made previously
-               // if(nextMove.equals(aMove.previousMoveId))
-                  //  continue;
+                // Skip past the move that would take us back to our previous empty position
+                if(nextMove.equals(aMove.previousEmptyPos))
+                    continue;
 
                 // This is an available move, so swap the empty space and the tile at this position
                 String tileToMove = aMove.layout.substring(nextMove, nextMove+1);
@@ -73,7 +74,7 @@ public class EightPuzzleSolver {
                 //sb.setCharAt(nextMove, EMPTY.charAt(0));
 
                 // Save this move to the generational map.  It will return true if we have solved the puzzle
-                if(addPuzzleMove(generationCounter, anId, String.valueOf(myArray)))
+                if(addPuzzleMove(generationCounter, anId, emptyPos, String.valueOf(myArray)))
                 {
                     System.out.println("Puzzle is solved");
                     return true;
@@ -83,9 +84,9 @@ public class EightPuzzleSolver {
         return false;
     }
 
-    boolean addPuzzleMove(int generation, String previousMoveId, String newLayout)
+    boolean addPuzzleMove(int generation, String previousMoveId, int previousEmptyPos, String newLayout)
     {
-        EightPuzzleMove newMove = new EightPuzzleMove(previousMoveId, newLayout);
+        EightPuzzleMove newMove = new EightPuzzleMove(previousMoveId, previousEmptyPos, newLayout);
 
         // See if this generation has started yet, if not create it
         if(generationLog.size() <= generation)
