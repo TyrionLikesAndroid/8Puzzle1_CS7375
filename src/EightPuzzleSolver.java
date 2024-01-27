@@ -5,19 +5,22 @@ import java.util.*;
 public class EightPuzzleSolver {
 
     private Vector<HashMap<String, EightPuzzleMove>> generationLog;
+    public TreeSet<String> layoutHistory;
     private final String solutionLayout = "123804765";
     static private final String START = "START";
     static private final String EMPTY = "0";
     static private final int INITIAL_EMPTY_POS = 99;
     private int generationCounter = 0;
     private int moveCounter = 0;
+    private EightPuzzleMove finalMove = null;
 
     public EightPuzzleSolver(String startingLayout)
     {
         generationLog = new Vector<>(50);
+        layoutHistory = new TreeSet<>();
 
         HashMap<String, EightPuzzleMove> firstGeneration = new HashMap<>();
-        firstGeneration.put(START, new EightPuzzleMove(START, INITIAL_EMPTY_POS, startingLayout));
+        firstGeneration.put(START, new EightPuzzleMove(START, INITIAL_EMPTY_POS, false, startingLayout));
         generationLog.add(generationCounter,firstGeneration);
     }
 
@@ -38,7 +41,18 @@ public class EightPuzzleSolver {
     public boolean iterateNextBFSGeneration()
     {
         // Get the moves from the current generation
-        HashMap<String, EightPuzzleMove> currentGeneration = generationLog.get(generationCounter);
+        HashMap<String, EightPuzzleMove> currentGeneration;
+
+        try {currentGeneration = generationLog.get(generationCounter); }
+        catch (Exception e)
+        {
+            // End gracefully if the starting point is not solvable for this solution layout
+            EightPuzzleMove startingPoint = generationLog.get(0).get(START);
+            System.out.println("Puzzle is not solvable for start[" + startingPoint.layout +
+                    "] and solution[" + solutionLayout + "]");
+            return true;
+        }
+
         Iterator<String> moveIds = currentGeneration.keySet().iterator();
 
         // move counter for next generation
@@ -63,20 +77,24 @@ public class EightPuzzleSolver {
                 if(nextMove.equals(aMove.previousEmptyPos))
                     continue;
 
+                // Skip past any moves that have already been flagged as pruned leaves of the tree
+                if(aMove.prunedLeaf)
+                    continue;
+
                 // This is an available move, so swap the empty space and the tile at this position
                 String tileToMove = aMove.layout.substring(nextMove, nextMove+1);
                 char[] myArray = aMove.layout.toCharArray();
                 myArray[emptyPos] = tileToMove.charAt(0);
                 myArray[nextMove] = EMPTY.charAt(0);
 
-                //StringBuilder sb = new StringBuilder(aMove.layout);
-                //sb.setCharAt(emptyPos, tileToMove.charAt(0));
-                //sb.setCharAt(nextMove, EMPTY.charAt(0));
+                // Save this move to the generational map.  It will return the new move instance
+                EightPuzzleMove newMove = addPuzzleMove(generationCounter, anId, emptyPos, String.valueOf(myArray));
 
-                // Save this move to the generational map.  It will return true if we have solved the puzzle
-                if(addPuzzleMove(generationCounter, anId, emptyPos, String.valueOf(myArray)))
+                // See if the puzzle is solved
+                if(solutionLayout.equals(newMove.layout))
                 {
                     System.out.println("Puzzle is solved");
+                    finalMove = newMove;
                     return true;
                 }
             }
@@ -84,9 +102,14 @@ public class EightPuzzleSolver {
         return false;
     }
 
-    boolean addPuzzleMove(int generation, String previousMoveId, int previousEmptyPos, String newLayout)
+    EightPuzzleMove addPuzzleMove(int generation, String previousMoveId, int previousEmptyPos, String newLayout)
     {
-        EightPuzzleMove newMove = new EightPuzzleMove(previousMoveId, previousEmptyPos, newLayout);
+        // Determine if this new move is a leaf of the tree that needs to be pruned.  Since every leaf turns
+        // into a root for subsequent generations, we don't need to add a redundant leaf if it has already been
+        // added to the tree
+        boolean pruneLeaf = layoutHistory.contains(newLayout);
+
+        EightPuzzleMove newMove = new EightPuzzleMove(previousMoveId, previousEmptyPos, pruneLeaf, newLayout);
 
         // See if this generation has started yet, if not create it
         if(generationLog.size() <= generation)
@@ -97,13 +120,32 @@ public class EightPuzzleSolver {
         String genId = generation + "-" + moveCounter++;
         genMap.put(genId, newMove);
 
+        // Add this layout to the layout history
+        layoutHistory.add(newLayout);
+
         System.out.println("Gen id["+ genId + "] move: " + newMove);
 
-        return (solutionLayout.equals(newMove.layout));
+        return newMove;
     }
 
     public void printSolution()
     {
-        System.out.println(solutionLayout);
+        if(finalMove != null)
+        {
+            EightPuzzleMove solutionMove = finalMove;
+            System.out.println("Final Move: " + finalMove);
+
+            while(! solutionMove.previousMoveId.equals(START))
+            {
+                String previousGenId = solutionMove.previousMoveId;
+                int delimeter = previousGenId.indexOf("-");
+                int previousGeneration = Integer.parseInt(previousGenId.substring(0,delimeter));
+                solutionMove = generationLog.get(previousGeneration).get(solutionMove.previousMoveId);
+                System.out.println("   Solution Move: " + solutionMove);
+            }
+
+            solutionMove = generationLog.get(0).get(START);
+            System.out.println("Starting Point: " + solutionMove);
+        }
     }
 }
