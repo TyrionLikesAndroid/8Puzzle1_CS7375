@@ -29,13 +29,16 @@ public class EightPuzzleSolver {
 
     }
 
-    public void solvePuzzleBFS()
+    public boolean solvePuzzleBFS()
     {
         while(! iterateNextBFSGeneration())
         {
-            System.out.println("Running Generation - " + generationCounter);
-            try { Thread.sleep(1000); } catch (Exception e) { e.printStackTrace(); }
+            //System.out.println("Running Generation - " + generationCounter);
+            try { Thread.sleep(10); } catch (Exception e) { e.printStackTrace(); }
         }
+
+        // Return whether we solved it successfully
+        return (finalMove != null);
     }
 
     public boolean iterateNextBFSGeneration()

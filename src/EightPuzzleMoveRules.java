@@ -6,6 +6,9 @@ import java.util.Vector;
 
 public class EightPuzzleMoveRules{
 
+    // This class contains all of the eligible move rules for the tiles in the puzzle.  The ruleset
+    // is a zero-based vector that contains a list of valid moves for each position in the puzzle.
+
     static Vector<LinkedList<String>> ruleSet;
 
     static void initialize()
