@@ -6,23 +6,24 @@ import java.util.List;
 
 public class EightPuzzleTestMain {
 
+    public static int ITERATIONS = 10;  // Define how many iterations we want the test to run
+
     // This class is the main test harness for the assignment.  It initializes the test classes,
     // generates the random starting point, runs the test, and prints out results
 
     public static void main(String[] args)
     {
-        String testStart = new String();
-        String randomStart = new String();
+        String testStart = "";
 
         // Save some test strings with known outcomes
-        // testStart = "235104876";  // 10th generation solve
-        // testStart = "235810764";  // 15th generation solve
-        // testStart = "123845706";  // 3rd generation solve
-        // testStart = "123845760";  // 2nd generation solve
-        // testStart = "467351280";  // 26th generation solve
-        // testStart = "206358471";  // 27th generation solve
-        // testStart = "758631204";  // 23rd generation solve
-        // testStart = "048563712";  // 28th generation solve
+        // testStart = "235104876";  // 10th generation DFS solve
+        // testStart = "235810764";  // 15th generation DFS solve
+        // testStart = "123845706";  // 3rd generation DFS solve
+        // testStart = "123845760";  // 2nd generation DFS solve
+        // testStart = "467351280";  // 26th generation DFS solve
+        // testStart = "206358471";  // 27th generation DFS solve
+        // testStart = "758631204";  // 23rd generation DFS solve
+        // testStart = "048563712";  // 28th generation DFS solve
         // testStart = "123874605";  // not solvable
 
         int successCount = 0;
@@ -32,8 +33,10 @@ public class EightPuzzleTestMain {
         EightPuzzleMoveRules.initialize();
 
         // Set up a testing loop for multiple iterations.  By default, just run it one time
-        for(int j = 0; j < 1; j++)
+        for(int j = 0; j < ITERATIONS; j++)
         {
+            String randomStart = "";
+
             if(testStart.isEmpty())
             {
                 // Create a random starting point based on all the possible tiles and shuffle them
@@ -54,12 +57,24 @@ public class EightPuzzleTestMain {
             // the successes and failures in the event we are doing a batch test
             EightPuzzleSolver solver = new EightPuzzleSolver(start);
             if(solver.solvePuzzleBFS())
+            {
                 successCount++;
+
+                // Print the BFS solution stack to the terminal
+                solver.printSolution();
+
+                // Reset to initial state
+                solver.reset();
+
+                // If BFS can solve it, go ahead and do a DFS solution.  There will never be a case where
+                // BFS will solve and DFS will not
+                solver.solvePuzzleDFS();
+
+                // Print the DFS solution stack to the terminal
+                solver.printSolution();
+            }
             else
                 failCount++;
-
-            // Print the solution stack to the terminal
-            solver.printSolution();
 
             // Print the incremental results from the test series
             System.out.println("Success = " + successCount + " Failure = " + failCount);

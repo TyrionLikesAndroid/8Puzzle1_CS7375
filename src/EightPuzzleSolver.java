@@ -6,7 +6,7 @@ public class EightPuzzleSolver {
 
     private Vector<HashMap<String, EightPuzzleMove>> generationLog;
     public TreeSet<String> layoutHistory;
-    private final String solutionLayout = "123804765";
+    static private final String solutionLayout = "123804765";
     static private final String START = "START";
     static private final String EMPTY = "0";
     static private final int INITIAL_EMPTY_POS = 99;
@@ -22,6 +22,19 @@ public class EightPuzzleSolver {
         HashMap<String, EightPuzzleMove> firstGeneration = new HashMap<>();
         firstGeneration.put(START, new EightPuzzleMove(START, INITIAL_EMPTY_POS, false, startingLayout));
         generationLog.add(generationCounter,firstGeneration);
+    }
+
+    public void reset()
+    {
+        // Reset back to initial state
+        generationCounter = 0;
+        moveCounter = 0;
+        finalMove = null;
+
+        layoutHistory.clear();
+
+        Iterator<HashMap<String, EightPuzzleMove>> generations = generationLog.iterator();
+        while(generations.hasNext()) { generations.next().clear(); }
     }
 
     public void solvePuzzleDFS()
@@ -96,7 +109,7 @@ public class EightPuzzleSolver {
                 // See if the puzzle is solved
                 if(solutionLayout.equals(newMove.layout))
                 {
-                    System.out.println("Puzzle is solved");
+                    System.out.println("Puzzle is solved with DFS");
                     finalMove = newMove;
                     return true;
                 }
