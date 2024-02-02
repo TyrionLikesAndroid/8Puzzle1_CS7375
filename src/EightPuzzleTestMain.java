@@ -6,7 +6,7 @@ import java.util.List;
 
 public class EightPuzzleTestMain {
 
-    public static int ITERATIONS = 10;  // Define how many iterations we want the test to run
+    public static int ITERATIONS = 1;  // Define how many iterations we want the test to run
 
     // This class is the main test harness for the assignment.  It initializes the test classes,
     // generates the random starting point, runs the test, and prints out results
@@ -16,14 +16,14 @@ public class EightPuzzleTestMain {
         String testStart = "";
 
         // Save some test strings with known outcomes
-        // testStart = "235104876";  // 10th generation DFS solve
-        // testStart = "235810764";  // 15th generation DFS solve
-        // testStart = "123845706";  // 3rd generation DFS solve
-        // testStart = "123845760";  // 2nd generation DFS solve
-        // testStart = "467351280";  // 26th generation DFS solve
-        // testStart = "206358471";  // 27th generation DFS solve
-        // testStart = "758631204";  // 23rd generation DFS solve
-        // testStart = "048563712";  // 28th generation DFS solve
+        // testStart = "235104876";  // 10th generation BFS solve
+        testStart = "235810764";  // 15th generation BFS solve
+        // testStart = "123845706";  // 3rd generation BFS solve
+        // testStart = "123845760";  // 2nd generation BFS solve
+        // testStart = "467351280";  // 26th generation BFS solve
+        // testStart = "206358471";  // 27th generation BFS solve
+        // testStart = "758631204";  // 23rd generation BFS solve
+        // testStart = "048563712";  // 28th generation BFS solve
         // testStart = "123874605";  // not solvable
 
         int successCount = 0;
