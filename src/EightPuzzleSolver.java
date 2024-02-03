@@ -200,7 +200,7 @@ public class EightPuzzleSolver {
                 // See if the puzzle is solved by comparing against our solution
                 if (solutionLayout.equals(newMove.layout))
                 {
-                    System.out.println("Puzzle is solved with BFS in [" +  parseGenerationId(newMove.moveId) + "] moves");
+                    System.out.println("\nPuzzle is solved with BFS in [" +  parseGenerationId(newMove.moveId) + "] moves");
                     finalMove = newMove;
                     return true;
                 }
