@@ -78,7 +78,7 @@ public class EightPuzzleSolver {
             // Determine whether this layout matches the solution for our puzzle
             if (solutionLayout.equals(focalMove.layout))
             {
-                System.out.println("Puzzle is solved with DFS");
+                System.out.println("\nPuzzle is solved with DFS in [" +  parseGenerationId(focalMoveId) + "] moves");
                 finalMove = focalMove;
                 return;
             }
@@ -200,7 +200,7 @@ public class EightPuzzleSolver {
                 // See if the puzzle is solved by comparing against our solution
                 if (solutionLayout.equals(newMove.layout))
                 {
-                    System.out.println("Puzzle is solved with BFS");
+                    System.out.println("Puzzle is solved with BFS in [" +  parseGenerationId(newMove.moveId) + "] moves");
                     finalMove = newMove;
                     return true;
                 }
@@ -280,23 +280,35 @@ public class EightPuzzleSolver {
         return String.valueOf(myArray);
     }
 
-    public void printSolution()
+    public void printSolution(boolean useAsciiArt)
     {
         // Helper function to print the entire solution stack when a solution exists
         if(finalMove != null)
         {
             EightPuzzleMove solutionMove = finalMove;
-            System.out.println("Final Move: " + finalMove);
+
+            if(! useAsciiArt)
+                System.out.println("Final Move: " + finalMove);
+            else
+                finalMove.printAsciiImage();
 
             while(! solutionMove.previousMoveId.equals(START))
             {
                 int previousGeneration = parseGenerationId(solutionMove.previousMoveId);
                 solutionMove = generationLog.get(previousGeneration).get(solutionMove.previousMoveId);
-                System.out.println("   Solution Move: " + solutionMove);
+
+                if(! useAsciiArt)
+                    System.out.println("   Solution Move: " + solutionMove);
+                else
+                    solutionMove.printAsciiImage();
             }
 
             solutionMove = generationLog.get(0).get(START);
-            System.out.println("Starting Point: " + solutionMove + "\n");
+
+            if(! useAsciiArt)
+                System.out.println("Starting Point: " + solutionMove + "\n");
+            else
+                solutionMove.printAsciiImage();
         }
     }
 }

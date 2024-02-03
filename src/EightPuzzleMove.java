@@ -27,7 +27,7 @@ public class EightPuzzleMove {
         availableMoves = new LinkedList<>();
     }
 
-    void addAvailableMoves(LinkedList<String> moves)
+    public void addAvailableMoves(LinkedList<String> moves)
     {
         availableMoves.addAll(moves);
     }
@@ -38,5 +38,15 @@ public class EightPuzzleMove {
                 "moveId='" + moveId + '\'' +
                 ", layout='" + layout + '\'' +
                 '}';
+    }
+
+    public void printAsciiImage()
+    {
+        char[] array = layout.toCharArray();
+        System.out.println("_____________");
+        System.out.print("| " + array[0] + " | " + array[1] + " | " + array[2] + " | \n");
+        System.out.print("| " + array[3] + " | " + array[4] + " | " + array[5] + " | \n");
+        System.out.print("| " + array[6] + " | " + array[7] + " | " + array[8] + " | \n");
+        System.out.println("_____________");
     }
 }

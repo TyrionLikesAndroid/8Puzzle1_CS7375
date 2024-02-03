@@ -62,7 +62,7 @@ public class EightPuzzleTestMain {
                 successCount++;
 
                 // Print the BFS solution stack to the terminal
-                solver.printSolution();
+                solver.printSolution(true);
 
                 // Reset to initial state
                 solver.reset();
@@ -72,7 +72,7 @@ public class EightPuzzleTestMain {
                 solver.solvePuzzleDFS();
 
                 // Print the DFS solution stack to the terminal
-                solver.printSolution();
+                solver.printSolution(true);
             }
             else
                 failCount++;
