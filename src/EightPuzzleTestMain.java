@@ -17,7 +17,7 @@ public class EightPuzzleTestMain {
 
         // Save some test strings with known outcomes
         // testStart = "235104876";  // 10th generation BFS solve
-        testStart = "235810764";  // 15th generation BFS solve
+        // testStart = "235810764";  // 15th generation BFS solve
         // testStart = "123845706";  // 3rd generation BFS solve
         // testStart = "123845760";  // 2nd generation BFS solve
         // testStart = "467351280";  // 26th generation BFS solve
@@ -51,7 +51,7 @@ public class EightPuzzleTestMain {
             String start = testStart.concat(randomStart);
 
             // Print starting point to the terminal
-            System.out.println("Starting Point = " + start);
+            System.out.println("Starting Point = " + start + "\n");
 
             // Create an instance of the puzzle solver and solve with breadth first search (BFS).  Count
             // the successes and failures in the event we are doing a batch test
