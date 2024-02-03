@@ -24,6 +24,7 @@ public class EightPuzzleTestMain {
         // testStart = "206358471";  // 27th generation BFS solve
         // testStart = "758631204";  // 23rd generation BFS solve
         // testStart = "048563712";  // 28th generation BFS solve
+        // testStart = "547068312";  // 29th generation BFS solve
         // testStart = "123874605";  // not solvable
 
         int successCount = 0;
