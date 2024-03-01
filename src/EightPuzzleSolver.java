@@ -20,10 +20,24 @@ public class EightPuzzleSolver {
     private int generationCounter = 0;  // Counter for the current move generation
     private int moveCounter = 0;  // Counter for the current move taken
     private EightPuzzleMove finalMove = null;  // Stores the final solution move (if one is found)
+    private PriorityQueue<EightPuzzleAStarOption> potentialMoves;  // Priority queue for storing future A* moves
+
+    class EightPuzzleAStarOptionCompare implements Comparator<EightPuzzleAStarOption> {
+
+        public int compare(EightPuzzleAStarOption a, EightPuzzleAStarOption b)
+        {
+            if(a.heuristicValue == b.heuristicValue)
+                return 0;
+
+            // Sort the lowest cost heuristics to the top
+            return (a.heuristicValue > b.heuristicValue) ? 1 : -1;
+        }
+    }
 
     public EightPuzzleSolver(String startingLayout) {
         this.generationLog = new Vector<>(50);
         this.layoutHistory = new HashMap<>();
+        this.potentialMoves = new PriorityQueue<>(new EightPuzzleAStarOptionCompare());
         this.startingLayout = startingLayout;
 
         HashMap<String, EightPuzzleMove> firstGeneration = new HashMap<>();
@@ -41,6 +55,7 @@ public class EightPuzzleSolver {
         finalMove = null;
 
         layoutHistory.clear();
+        potentialMoves.clear();
 
         Iterator<HashMap<String, EightPuzzleMove>> generations = generationLog.iterator();
         while (generations.hasNext()) {
@@ -50,6 +65,64 @@ public class EightPuzzleSolver {
         // Reset the starting point
         generationLog.get(generationCounter).put(START,
                 new EightPuzzleMove(START, START, INITIAL_EMPTY_POS, false, startingLayout));
+    }
+
+    public void solvePuzzleAStar() {
+        // This is the entry point for the A* Search algorithm.  It will evaluate the heuristic function for
+        // each available move and take the most appealing choice as it traverses the tree
+
+        // Set the initial focal move to the first generation node
+        EightPuzzleMove focalMove = generationLog.get(0).get(START);
+
+        // Initialize the location of the empty square in our focal move
+        int emptyPos = focalMove.layout.indexOf(EMPTY);
+
+        // Loop forever until we solve the puzzle.  Since we have already solved via BFS, we
+        // know a solution exists
+        while (true)
+        {
+            // Grab the unique id for this focal move.  The unique id is a key which concatenates the
+            // generation of this move with the move id, separated by a hyphen
+            String focalMoveId = focalMove.moveId;
+
+            // Determine whether this layout matches the solution for our puzzle
+            if (solutionLayout.equals(focalMove.layout))
+            {
+                System.out.println("\nPuzzle is solved with A* in [" +  parseGenerationId(focalMoveId) + "] moves");
+                finalMove = focalMove;
+                return;
+            }
+
+            // Evaluate the heuristic for all the moves that are possible from this focal node.
+            Iterator<String> moves = EightPuzzleMoveRules.getAvailableMoves(emptyPos).iterator();
+            while (moves.hasNext())
+            {
+                String targetPos = moves.next();
+                int heuristicVal = calculateAStarHeuristic(focalMove, emptyPos, Integer.parseInt(targetPos));
+
+                // Add the potential move into the priority queue with its heuristic value
+                potentialMoves.add(new EightPuzzleAStarOption(focalMove, heuristicVal, targetPos));
+            }
+
+            // Choose the top value in the sorted list, which will always be the one with the
+            // lowest heuristic score and be the best possible option.
+            EightPuzzleAStarOption nextBestOption = potentialMoves.poll();
+
+            // Increment the counter relative to the previous move option.  A* can move up and down
+            // the stack based on the best heuristic, we have to increment the generation relatively.
+            generationCounter = parseGenerationId(nextBestOption.previousLayout.moveId);
+            generationCounter++;
+
+            // Generate the new layout based on swapping the next move and empty position
+            emptyPos = nextBestOption.previousLayout.layout.indexOf(EMPTY);
+            String newLayout = calculateNextLayout(nextBestOption.previousLayout,
+                    Integer.valueOf(nextBestOption.moveOption), emptyPos);
+
+            // Save the new move on the generational map.  It will return a new focal move for next iteration
+            // and we need to reset our empty position based on the new layout
+            focalMove = addPuzzleMove(generationCounter, nextBestOption.previousLayout.moveId, emptyPos, newLayout);
+            emptyPos = focalMove.layout.indexOf(EMPTY);
+        }
     }
 
     public void solvePuzzleDFS() {
@@ -145,7 +218,7 @@ public class EightPuzzleSolver {
         return (finalMove != null);
     }
 
-    public boolean iterateNextBFSGeneration()
+    private boolean iterateNextBFSGeneration()
     {
         // Retrieve the moves for the current generation out of the log
         HashMap<String, EightPuzzleMove> currentGeneration;
@@ -209,7 +282,7 @@ public class EightPuzzleSolver {
         return false;
     }
 
-    EightPuzzleMove addPuzzleMove(int generation, String previousMoveId, int previousEmptyPos, String newLayout)
+    private EightPuzzleMove addPuzzleMove(int generation, String previousMoveId, int previousEmptyPos, String newLayout)
     {
         // Determine if this new move is a leaf of the tree that needs to be pruned.  Since every leaf turns
         // into a root for subsequent generations, we don't need to explore leaves that have already been seen
@@ -268,7 +341,7 @@ public class EightPuzzleSolver {
         return out;
     }
 
-    public String calculateNextLayout(EightPuzzleMove move, int movingTilePosition, int blankPosition)
+    private String calculateNextLayout(EightPuzzleMove move, int movingTilePosition, int blankPosition)
     {
         // Helper function for generating a string representation for the next move on the puzzle
 
@@ -278,6 +351,37 @@ public class EightPuzzleSolver {
         myArray[movingTilePosition] = EMPTY.charAt(0);
 
         return String.valueOf(myArray);
+    }
+
+    private int calculateAStarHeuristic(EightPuzzleMove focalMove, int emptyPosition, int targetPosition)
+    {
+        // Get the generation id, that is the cost from the start.  Initialize our forward cost
+        int backwardCost = parseGenerationId(focalMove.moveId);
+        int forwardCost = 0;
+
+        // Determine what the proposed layout would potentially look like
+        String proposedLayout = calculateNextLayout(focalMove,targetPosition, emptyPosition);
+
+        // Calculate the cumulative future cost for all the tile moves to get from the proposed layout
+        // to the solution layout.
+        for(int i = 0; i < 9; i++)
+        {
+            // Determine which tile is in the current index position
+            String tileToMove = proposedLayout.substring(i, i + 1);
+
+            // Skip over the empty tile
+            if(tileToMove.equals(EMPTY))
+                continue;
+
+            // Find what position the current tile is located in the solution layout
+            int solutionPosition = solutionLayout.indexOf(tileToMove);
+            forwardCost += EightPuzzleMoveRules.calculateManhattanDistance(i,solutionPosition);
+
+            //System.out.println("Heuristic step[" + i + "] proposed=" + proposedLayout + " solution=" +
+            //        solutionLayout + " value=" + forwardCost);
+        }
+
+        return backwardCost + forwardCost;
     }
 
     public void printSolution(boolean useAsciiArt)

@@ -62,7 +62,7 @@ public class EightPuzzleTestMain {
                 successCount++;
 
                 // Print the BFS solution stack to the terminal
-                solver.printSolution(true);
+                solver.printSolution(false);
 
                 // Reset to initial state
                 solver.reset();
@@ -72,7 +72,16 @@ public class EightPuzzleTestMain {
                 solver.solvePuzzleDFS();
 
                 // Print the DFS solution stack to the terminal
-                solver.printSolution(true);
+                solver.printSolution(false);
+
+                // Reset to initial state once more
+                solver.reset();
+
+                // Solve for A* since we know a solution exists
+                solver.solvePuzzleAStar();
+
+                // Print the A* solution stack to the terminal
+                solver.printSolution(false);
             }
             else
                 failCount++;

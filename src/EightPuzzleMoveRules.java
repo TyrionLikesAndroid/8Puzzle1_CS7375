@@ -30,4 +30,16 @@ public class EightPuzzleMoveRules{
         return ruleSet.get(emptyPosition);
     }
 
+    static int calculateManhattanDistance(int startPosition, int endPosition)
+    {
+        // Calculate the Manhattan distance by adding vertical and horizontal distances between points
+
+        int horizontalDist = Math.abs((startPosition % 3) - (endPosition % 3));
+        int verticalDist = Math.abs((startPosition / 3) - (endPosition / 3));
+
+        //System.out.println(horizontalDist + " , " + verticalDist);
+
+        return horizontalDist + verticalDist;
+    }
+
 }
