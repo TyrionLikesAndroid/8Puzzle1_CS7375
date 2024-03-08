@@ -325,6 +325,33 @@ public class EightPuzzleSolver {
         return Integer.parseInt(genId.substring(0, delimeter));
     }
 
+    private int parseTotalMoves(String genId)
+    {
+        // Helper function to parse the generation value out of an id
+        int delimeter = genId.indexOf("-");
+        return Integer.parseInt(genId.substring(delimeter+1, genId.length()));
+    }
+
+    public int totalMovesToSolve()
+    {
+        int out = 0;
+
+        if(finalMove != null)
+            out = parseGenerationId(finalMove.moveId);
+
+        return out;
+    }
+
+    public int totalIterationsToSolve()
+    {
+        int out = 0;
+
+        if(finalMove != null)
+            out = parseTotalMoves(finalMove.moveId);
+
+        return out;
+    }
+
     private EightPuzzleMove recurseForNextAvailableMove(EightPuzzleMove initialMove)
     {
         // Helper function for the DFS algorithm used to recurse back up the stack in search

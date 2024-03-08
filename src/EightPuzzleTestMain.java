@@ -6,7 +6,7 @@ import java.util.List;
 
 public class EightPuzzleTestMain {
 
-    public static int ITERATIONS = 1;  // Define how many iterations we want the test to run
+    public static int ITERATIONS = 1000;  // Define how many iterations we want the test to run
 
     // This class is the main test harness for the assignment.  It initializes the test classes,
     // generates the random starting point, runs the test, and prints out results
@@ -29,6 +29,18 @@ public class EightPuzzleTestMain {
 
         int successCount = 0;
         int failCount = 0;
+
+        int bfsWins = 0;
+        int dfsWins = 0;
+        int aStarWins = 0;
+
+        int bfsIterations = 0;
+        int dfsIterations = 0;
+        int aStarIterations = 0;
+
+        int totalBfsIterations = 0;
+        int totalDfsIterations = 0;
+        int totalAStarIterations = 0;
 
         // Initialize our static rule set
         EightPuzzleMoveRules.initialize();
@@ -63,6 +75,7 @@ public class EightPuzzleTestMain {
 
                 // Print the BFS solution stack to the terminal
                 solver.printSolution(false);
+                bfsIterations = solver.totalIterationsToSolve();
 
                 // Reset to initial state
                 solver.reset();
@@ -73,6 +86,7 @@ public class EightPuzzleTestMain {
 
                 // Print the DFS solution stack to the terminal
                 solver.printSolution(false);
+                dfsIterations = solver.totalIterationsToSolve();
 
                 // Reset to initial state once more
                 solver.reset();
@@ -82,6 +96,24 @@ public class EightPuzzleTestMain {
 
                 // Print the A* solution stack to the terminal
                 solver.printSolution(false);
+                aStarIterations = solver.totalIterationsToSolve();
+
+                // Determine which algorithm was the most efficient for this particular layout
+                if(bfsIterations < dfsIterations)
+                    if(bfsIterations < aStarIterations)
+                        bfsWins++;
+                    else
+                        aStarWins++;
+                else
+                    if(dfsIterations < aStarIterations)
+                        dfsWins++;
+                    else
+                        aStarWins++;
+
+                // Save the total number of iterations
+                totalBfsIterations += bfsIterations;
+                totalDfsIterations += dfsIterations;
+                totalAStarIterations += aStarIterations;
             }
             else
                 failCount++;
@@ -89,5 +121,10 @@ public class EightPuzzleTestMain {
             // Print the incremental results from the test series
             System.out.println("Success = " + successCount + " Failure = " + failCount);
         }
+
+        // Compare the algorithm results
+        System.out.println("BFS Wins = " + bfsWins + " DFS Wins = " + dfsWins + " A* Wins = " + aStarWins);
+        System.out.println("Average Iterations:  BFS = " + totalBfsIterations/successCount +
+                " DFS = " + totalDfsIterations/successCount + " A* = " + totalAStarIterations/successCount);
     }
 }
