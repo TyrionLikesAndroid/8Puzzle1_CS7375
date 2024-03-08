@@ -93,6 +93,8 @@ public class EightPuzzleSolver {
                 return;
             }
 
+            // System.out.println("Calculate options for layout = " + focalMove.layout);
+
             // Evaluate the heuristic for all the moves that are possible from this focal node.
             Iterator<String> moves = EightPuzzleMoveRules.getAvailableMoves(emptyPos).iterator();
             while (moves.hasNext())
@@ -408,10 +410,10 @@ public class EightPuzzleSolver {
             // Find what position the current tile is located in the solution layout
             int solutionPosition = solutionLayout.indexOf(tileToMove);
             forwardCost += EightPuzzleMoveRules.calculateManhattanDistance(i,solutionPosition);
-
-            //System.out.println("Heuristic step[" + i + "] proposed=" + proposedLayout + " solution=" +
-            //        solutionLayout + " value=" + forwardCost);
         }
+
+        //System.out.println("   Total cost for layout [" + focalMove.layout + "] possibleNextMove=" + targetPosition +
+            //    " value=" + (forwardCost + backwardCost));
 
         return backwardCost + forwardCost;
     }
