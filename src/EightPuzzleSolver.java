@@ -98,6 +98,11 @@ public class EightPuzzleSolver {
             while (moves.hasNext())
             {
                 String targetPos = moves.next();
+
+                // Skip past the move that would take us back to our previous empty position
+                if (Integer.parseInt(targetPos) == focalMove.previousEmptyPos)
+                    continue;
+
                 int heuristicVal = calculateAStarHeuristic(focalMove, emptyPos, Integer.parseInt(targetPos));
 
                 // Add the potential move into the priority queue with its heuristic value
